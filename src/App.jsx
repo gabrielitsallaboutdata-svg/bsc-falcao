@@ -168,8 +168,17 @@ export default function App() {
     loadData();
   }, []);
 
-  async function loadData() {
+async function loadData() {
     setLoading(true);
+    const mesMap = {'jan':'Jan','fev':'Fev','mar':'Mar','abr':'Abr','mai':'Mai','jun':'Jun','jul':'Jul','ago':'Ago','set':'Set','out':'Out','nov':'Nov','dez':'Dez'};
+    function normMes(mes) {
+      if (!mes) return mes;
+      if (/^[A-Z][a-z]{2}\/\d{2}$/.test(mes)) return mes;
+      const clean = mes.toLowerCase().replace('.','').trim();
+      const pref = clean.substring(0,3);
+      const ano = mes.match(/\d{2}/);
+      return mesMap[pref] ? mesMap[pref] + '/' + (ano ? ano[0] : '26') : mes;
+    }
     try {
       const r = await fetch(API.carregarDados);
       if (!r.ok) throw new Error("HTTP " + r.status);
@@ -178,11 +187,14 @@ export default function App() {
       const newScores = {};
       rows.forEach(row => {
         if (!row.departamento || !row.nome || !row.perspectiva || !row.mes) return;
-        const key = `${row.departamento}|${row.nome}|${row.perspectiva}|${row.mes}`;
-        newScores[key] = parseFloat(row.nota);
+        const mes = normMes(String(row.mes));
+        const key = `${row.departamento}|${row.nome}|${row.perspectiva}|${mes}`;
+        const nota = parseFloat(row.nota);
+        if (!isNaN(nota)) newScores[key] = nota;
       });
       setScores(newScores);
       setOffline(false);
+      try { window.localStorage.setItem("bsc-cache", JSON.stringify({ scores: newScores, obs })); } catch {}
     } catch (e) {
       console.error("Erro ao carregar:", e);
       setOffline(true);
