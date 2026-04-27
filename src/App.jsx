@@ -210,9 +210,16 @@ async function loadData() {
 
 const saveScore = useCallback(async (d, c, p, m, v) => {
     const key = `${d}|${c}|${p}|${m}`;
-    if (v === "" || v == null) return; // Ignora campo vazio
+    // Se apagou o campo, remove do estado local mas nao salva no Sheets
+    if (v === "" || v == null) {
+      const ns = { ...scores };
+      delete ns[key];
+      setScores(ns);
+      try { window.localStorage.setItem("bsc-cache", JSON.stringify({ scores: ns, obs })); } catch {}
+      return;
+    }
     const parsed = parseFloat(v);
-    if (isNaN(parsed)) return; // Ignora valor invalido
+    if (isNaN(parsed)) return;
     const val = Math.min(3, Math.max(0, parsed));
     const ns = { ...scores, [key]: val };
     setScores(ns);
