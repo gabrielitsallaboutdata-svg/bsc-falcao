@@ -118,11 +118,10 @@ const DEPTS = {
   },
 };
 
-const N8N_BASE = "https://ia.falcaodasmilhasdata.com/webhook";
 const API = {
-  salvarNota: `${N8N_BASE}/bsc-salvar-nota`,
-  carregarDados: `${N8N_BASE}/bsc-carregar-dados`,
-  salvarObs: `${N8N_BASE}/bsc-salvar-obs`,
+  salvarNota: "/api/salvar-nota",
+  carregarDados: "/api/carregar-dados",
+  salvarObs: "/api/salvar-obs",
 };
 
 function rag(v) {
