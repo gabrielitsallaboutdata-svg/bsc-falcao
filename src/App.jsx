@@ -196,9 +196,12 @@ export default function App() {
     setLoading(false);
   }
 
-  const saveScore = useCallback(async (d, c, p, m, v) => {
+const saveScore = useCallback(async (d, c, p, m, v) => {
     const key = `${d}|${c}|${p}|${m}`;
-    const val = v === "" ? null : Math.min(3, Math.max(0, parseFloat(v)));
+    if (v === "" || v == null) return; // Ignora campo vazio
+    const parsed = parseFloat(v);
+    if (isNaN(parsed)) return; // Ignora valor invalido
+    const val = Math.min(3, Math.max(0, parsed));
     const ns = { ...scores, [key]: val };
     setScores(ns);
     try { window.localStorage.setItem("bsc-cache", JSON.stringify({ scores: ns, obs })); } catch {}
